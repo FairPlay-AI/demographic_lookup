@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.9
 # coding: utf-8
 
 import datetime
@@ -51,16 +51,15 @@ class GetDemoPercentagesFromNames():
         yf_return = yf_merged[[0, '2_x', '2_y']]
         yf_return.columns = ['name', 'pctfemale', 'pctmale']
         
-        yf_return.name = yf_return.name.str.lower()
-        
         yf_totals = yf_return.pctfemale + yf_return.pctmale
-        yf_return.pctfemale = yf_return.pctfemale / yf_totals
-        yf_return.pctmale = yf_return.pctmale / yf_totals
         
-        yf_return.loc[:, 'yob'] = (
-            np.array([year] * yf_return.shape[0]).reshape(-1, 1))
+        retval = pd.DataFrame({
+            'name' : yf_return.name.str.lower(),
+            'pctfemale' : yf_return.pctfemale / yf_totals,
+            'pctmale' : yf_return.pctmale / yf_totals,
+            'yob' : [year] * yf_return.shape[0]})
         
-        return yf_return
+        return retval
     
     def build_gender_table(self):
         first_name_directory = (
