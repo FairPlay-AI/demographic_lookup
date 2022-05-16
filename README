@@ -1,0 +1,24 @@
+PROJECT: demographic_lookup
+
+PURPOSE:
+
+This is a very simple-minded blob of code which estimates the racial
+and ethnic probabilities associated with surnames and gender
+probabilities associated with first names. It is typically used as
+part of the CFPB implementation of Bayesian Improved Surname Geocoding
+(BISG) for racial and ethnic classification or its parallel for gender
+imputation.
+
+USAGE:
+
+python3 name-lookup.py < tests/invalid_column_test
+
+./name-lookup [input filename]
+
+computes probabilities corresponding to names from the specified input file.
+
+Alternatively
+
+./name-lookup.py < <input file>
+
+computes probabilites corresponding to names from standard input.
