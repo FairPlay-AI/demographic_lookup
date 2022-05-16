@@ -33,6 +33,15 @@ class GetDemoPercentagesFromNames():
         self.first_name_freqs = self.build_gender_table()
         
     def _build_year_gender_table(self, current_path):
+        """BUild the gender ratio table for a single year.
+
+        The SSA name database is brokwn up by year. This is
+        essential, since names have different gender breakdowns
+        at different times (e.g. Taylor is overwhelmingly male 
+        for children born in 1960, but predominantly female
+        for children born 1990.
+        """
+
         year = (
             int(re.sub('yob([0-9]*).txt',
                        '\g<1>',
@@ -62,6 +71,7 @@ class GetDemoPercentagesFromNames():
         return retval
     
     def build_gender_table(self):
+        """Collect and join the fist name tables across all years."""
         first_name_directory = (
             pathlib.Path('./first_names'))
         first_name_paths = (
@@ -77,10 +87,18 @@ class GetDemoPercentagesFromNames():
         
         return first_name_freqs
     
-    ## The BISG memo specifies this extra name cleap up step
-    ## so that the names in the tables match the inputs as
-    ## well as possible.
     def _clean_bisg_names(self, name_series):
+        """Apply the CFPB name-cleaning algorithm to input names.
+
+        'Real' names are complicated and inconsistent,
+        which means that many of them should match a name
+        in the database won't unless they're cleaned up.
+        The CFPB 2014 BISG report specifies a particular
+        cleaning procedure, which, while far from perfect
+        if significantly better than nothing. This function
+        implements that process.
+        """
+
         special_character_re = re.compile('[\`\{}\\,.0-9]')
         apostrophe_replace_re = re.compile("[']")
         double_quote_replace_re = re.compile('\"')
@@ -102,6 +120,14 @@ class GetDemoPercentagesFromNames():
         return ns_temp
 
     def build_last_name_freqs(self, last_names):
+        """Compute the race and ethnicity probabilities
+
+        Given the list of last names in last_names, clean the
+        names and then look up the probabilities for those last names.
+        In the cases where a last name can't be found, substitute
+        eqaul probabilities so that the resulting imputed probabilities
+        will simply reflect the underlying census tract."""
+
         transformed_last_names = pd.DataFrame(
             { 'surname' : self._clean_bisg_names(last_names.iloc[:, 0])})
         
@@ -119,6 +145,13 @@ class GetDemoPercentagesFromNames():
         return retval
     
     def build_first_name_freqs(self, first_names, dobs):
+        """Compute the gender probability estimates
+
+        Unlike the last name case, the first name case has
+        two input terms: the name and the date of birth of
+        the applicant, because the SSA database is structured by
+        year."""
+
         dob_datetimes = pd.to_datetime(dobs)
         dob_datetimes[dob_datetimes.isnull()] = (
             datetime.datetime.fromisoformat('1990-01-01'))
