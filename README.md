@@ -2,17 +2,17 @@
 
 ## Purpose
 
-This is a very simple-minded blob of code which estimates the racial
+This is a very simple code example which estimates the racial
 and ethnic probabilities associated with surnames and gender
-probabilities associated with first names. It is typically used as
-part of the CFPB implementation of Bayesian Improved Surname Geocoding
-(BISG) for racial and ethnic classification or its parallel for gender
-imputation.
+probabilities associated with first names.
+
+It is typically used as part of the CFPB implementation of
+Bayesian Improved Surname Geocoding (BISG) for racial and ethnic
+classification or its parallel for gender imputation.
 
 ## Installation
 
 ```shell
-
 $ pip install -r requirements.txt
 ```
 
