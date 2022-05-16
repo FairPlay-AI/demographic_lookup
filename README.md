@@ -1,4 +1,4 @@
-# demographic_lookup
+# `demographic_lookup`
 
 ## Purpose
 
