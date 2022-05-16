@@ -1,6 +1,6 @@
 # demographic_lookup
 
-## PURPOSE
+## Purpose
 
 This is a very simple-minded blob of code which estimates the racial
 and ethnic probabilities associated with surnames and gender
@@ -16,7 +16,7 @@ imputation.
 $ pip install -r requirements.txt
 ```
 
-## USAGE
+## Usage
 
 To compute probabilities corresponding to names from the specified input file:
 
@@ -25,7 +25,7 @@ $ python3 name-lookup.py < tests/invalid_column_test
 $ ./name-lookup [input filename]
 ```
 
-Alternatively, compute probabilites corresponding to names from standard input:
+Alternatively, to compute probabilites corresponding to names from standard input:
 
 ```
 $ ./name-lookup.py < <input file>
