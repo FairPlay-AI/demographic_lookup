@@ -10,6 +10,7 @@ import sys
 import numpy as np
 import pandas as pd
 
+
 class GetDemoPercentagesFromNames():
     last_name_probability_columns = [
         'pctwhite',
