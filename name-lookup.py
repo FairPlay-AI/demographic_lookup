@@ -10,7 +10,6 @@ import sys
 import numpy as np
 import pandas as pd
 
-
 class GetDemoPercentagesFromNames():
     last_name_probability_columns = [
         'pctwhite',
@@ -80,7 +79,8 @@ class GetDemoPercentagesFromNames():
         return first_name_freqs
     
     ## The BISG memo specifies this extra name cleap up step
-    ## so that the 
+    ## so that the names in the tables match the inputs as
+    ## well as possible.
     def _clean_bisg_names(self, name_series):
         special_character_re = re.compile('[\`\{}\\,.0-9]')
         apostrophe_replace_re = re.compile("[']")
