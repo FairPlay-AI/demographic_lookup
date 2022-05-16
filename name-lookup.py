@@ -12,6 +12,8 @@ import pandas as pd
 
 
 class GetDemoPercentagesFromNames():
+    """Gets imputed probabilities from applicant names"""
+
     last_name_probability_columns = [
         'pctwhite',
         'pctblack',
@@ -34,13 +36,17 @@ class GetDemoPercentagesFromNames():
         self.first_name_freqs = self.build_gender_table()
         
     def _build_year_gender_table(self, current_path):
-        """BUild the gender ratio table for a single year.
+        """Build the gender ratio table for a single year.
 
-        The SSA name database is brokwn up by year. This is
+        The SSA name database is broken up by year. This is
         essential, since names have different gender breakdowns
         at different times (e.g. Taylor is overwhelmingly male 
         for children born in 1960, but predominantly female
         for children born 1990.
+        
+        Params:
+            current_path (str): the path to the current first name year
+                                file (e.g. yob1880.txt)
         """
 
         year = (
@@ -72,7 +78,7 @@ class GetDemoPercentagesFromNames():
         return retval
     
     def build_gender_table(self):
-        """Collect and join the fist name tables across all years."""
+        """Collect and join the fist name tables across all years"""
         first_name_directory = (
             pathlib.Path('./first_names'))
         first_name_paths = (
@@ -98,6 +104,10 @@ class GetDemoPercentagesFromNames():
         cleaning procedure, which, while far from perfect
         if significantly better than nothing. This function
         implements that process.
+        
+        Params:
+             name_series [str]: the union set of last or first names considered in the 
+                                BISG imputation method
         """
 
         special_character_re = re.compile('[\`\{}\\,.0-9]')
@@ -127,7 +137,12 @@ class GetDemoPercentagesFromNames():
         names and then look up the probabilities for those last names.
         In the cases where a last name can't be found, substitute
         eqaul probabilities so that the resulting imputed probabilities
-        will simply reflect the underlying census tract."""
+        will simply reflect the underlying census tract.
+        
+        Params:
+            last_names [str]: all the last names to consider as part 
+                              of imputation method.  case-insensitive.
+        """
 
         transformed_last_names = pd.DataFrame(
             { 'surname' : self._clean_bisg_names(last_names.iloc[:, 0])})
@@ -151,7 +166,13 @@ class GetDemoPercentagesFromNames():
         Unlike the last name case, the first name case has
         two input terms: the name and the date of birth of
         the applicant, because the SSA database is structured by
-        year."""
+        year.
+        
+        Params:
+        
+            first_names [str]: all the first names to consider as part 
+                               of imputation method.  case-insensitive.
+        """
 
         dob_datetimes = pd.to_datetime(dobs)
         dob_datetimes[dob_datetimes.isnull()] = (
@@ -179,6 +200,8 @@ class GetDemoPercentagesFromNames():
         return retval
         
 def main():
+    """main method"""
+
     probability_converter = GetDemoPercentagesFromNames()
     
     first_name_columns = ['applicant_first_name', 'applicant_dob']
@@ -220,5 +243,6 @@ def main():
             axis='columns')
         
         output_block.to_csv(sys.stdout)
+
 if __name__ == '__main__':
     main()
