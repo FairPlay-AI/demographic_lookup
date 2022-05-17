@@ -18,15 +18,20 @@ $ pip install -r requirements.txt
 
 ## Usage
 
-To compute probabilities corresponding to names from the specified input file:
-
 ```bash
-$ python3 name-lookup.py < tests/invalid_column_test
-$ ./name-lookup [input filename]
-```
+usage: name-lookup.py [-h] [-f FIRST_NAME] [-l LAST_NAME] [-d DATE_OF_BIRTH] input_file_name
 
-Alternatively, to compute probabilites corresponding to names from standard input:
+Look up gender, race, and ethnicity probabilities
 
-```
-$ ./name-lookup.py < <input file>
+positional arguments:
+  input_file_name       Input file name ('-' for standard input)
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f FIRST_NAME, --first-name FIRST_NAME
+                        Name of column containing applicant first names
+  -l LAST_NAME, --last-name LAST_NAME
+                        Name of column containing applicant last names
+  -d DATE_OF_BIRTH, --date-of-birth DATE_OF_BIRTH
+                        Name of column containing applicant dates of birth
 ```
