@@ -1,6 +1,7 @@
-#!/usr/bin/env python3.9
+#!/usr/bin/env python3
 # coding: utf-8
 
+import argparse
 import datetime
 import os
 import pathlib
@@ -202,15 +203,47 @@ class GetDemoPercentagesFromNames():
 def main():
     """main method"""
 
+    ##
+    command_line_parser = (
+        argparse.ArgumentParser(
+            description=(
+                'Look up gender, race, and ethnicity probabilities')))
+    
+    command_line_parser.add_argument(
+        '-f', '--first-name',
+        dest='first_name',
+        type=str,
+        default='applicant_first_name',
+        help='Name of column containing applicant first names')
+    command_line_parser.add_argument(
+        '-l', '--last-name',
+        dest='last_name',
+        type=str,
+        default='applicant_last_name',
+        help='Name of column containing applicant last names')
+    command_line_parser.add_argument(
+        '-d', '--date-of-birth',
+        dest='date_of_birth',
+        type=str,
+        default='applicant_dob',
+        help='Name of column containing applicant dates of birth')
+    command_line_parser.add_argument(
+        'input_file_name',
+        type=str,
+        help='Input file name (\'-\' for standard input)')
+    
+    args = command_line_parser.parse_args()
+    
+    ##
     probability_converter = GetDemoPercentagesFromNames()
     
-    first_name_columns = ['applicant_first_name', 'applicant_dob']
-    last_name_columns =  ['applicant_last_name']
+    first_name_columns = [args.first_name, args.date_of_birth]
+    last_name_columns =  [args.last_name]
     
-    if len(sys.argv) < 2 or (sys.argv[1] == '-'):
+    if args.input_file_name == '-':
         input_fd = sys.stdin
     else:
-        input_fd = open(sys.argv[1])
+        input_fd = open(args.input_file_name)
         
     input_data_iterator = pd.read_csv(
         input_fd,
