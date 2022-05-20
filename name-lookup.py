@@ -231,6 +231,10 @@ def main():
         'input_file_name',
         type=str,
         help='Input file name (\'-\' for standard input)')
+    command_line_parser.add_argument(
+        'output_file_name',
+        type=str,
+        help='Output file name (\'-\' for standard output)')
     
     args = command_line_parser.parse_args()
     
@@ -251,12 +255,19 @@ def main():
         index_col=False,
         dtype=str)
     
+    if args.output_file_name == '-':
+        output_fd = sys.stdout
+    else:
+        output_fd = open(args.output_file_name, 'w', newline='')
+        
+    header_block = True
+    
     for input_block in input_data_iterator:
         first_name_chunk = input_block[first_name_columns]
         first_name_probs = (
             probability_converter.build_first_name_freqs(
-                first_name_chunk.applicant_first_name,
-                first_name_chunk.applicant_dob))
+                first_name_chunk[args.first_name],
+                first_name_chunk[args.date_of_birth]))
         first_name_probs = first_name_probs
         
         last_name_chunk = input_block[last_name_columns]
@@ -267,15 +278,21 @@ def main():
         reduced_input_block = input_block[
             np.setdiff1d(
                 input_block.columns,
-                first_name_columns + last_name_columns)]
+                [args.first_name, args.last_name])]
         
         output_block = pd.concat([
-            reduced_input_block,
-            last_name_probs,
-            first_name_probs],
+            reduced_input_block.reset_index(drop=True),
+            last_name_probs.reset_index(drop=True),
+            first_name_probs.reset_index(drop=True)],
             axis='columns')
         
-        output_block.to_csv(sys.stdout)
+        output_block.to_csv(
+            output_fd,
+            header=header_block,
+            mode='w',
+            index=False)
+        
+        header_block = False
 
 if __name__ == '__main__':
     main()
