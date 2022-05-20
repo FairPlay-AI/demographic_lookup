@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This code example which estimates the racial
+This code example estimates the racial
 and ethnic probabilities associated with surnames and gender
 probabilities associated with first names.
 
