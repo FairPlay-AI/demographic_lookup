@@ -156,8 +156,7 @@ class GetDemoPercentagesFromNames():
         retval.drop(['surname', 'name'],
                     axis='columns',
                     inplace=True)
-        retval = retval.replace(
-            np.NaN, 1 / len(self.last_name_probability_columns))
+        retval = retval.replace(np.NaN, 1)
         
         return retval
     
@@ -196,7 +195,7 @@ class GetDemoPercentagesFromNames():
         retval.drop(['first_name', 'name', 'yob'],
                     axis='columns',
                     inplace=True)
-        retval = retval.replace(np.NaN, 0.5)
+        retval = retval.replace(np.NaN, 1)
         
         return retval
         
