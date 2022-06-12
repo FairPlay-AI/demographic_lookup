@@ -3,46 +3,66 @@ import os
 import numpy as np
 import pandas as pd
 
-class NameChooser:
+class RandomNameChooser:
+    def __init__(self):
+        last_names_base = pd.read_csv(
+            os.path.join(
+                os.getcwd(),
+                'surnames',
+                'Names_2010Census.csv'))
+        
+        self.last_names = (
+            last_names_base[last_names_base['name'] != 
+                            'ALL OTHER NAMES'])
+
     def _pick_single_names(self, frequency_table, sample):
         random_item = (
-            (frequency_table.probs > sample).idxmax())
+            (frequency_table.probs.cumsum() > sample).idxmax())
         
-        return frequency_table.name
+        return frequency_table.name[random_item]
     
     def _pick_names(self,
-                    name_type,
                     frequency_table_base, 
                     count,
                     rng):
-        frequency_table = frequency_table_base[
-            frequency_table_base.name_type == name_type]
-        
-        frequency_table.probs = (
-            frequency_table.name_count /
-            frequency_table.name_count.sum())
+        frequency_table = pd.DataFrame({
+            'name' : frequency_table_base['names'],
+            'probs' : (
+                frequency_table_base.name_count /
+                frequency_table_base.name_count.sum())})
         
         samples = rng.uniform(size=count)
         
         return [
-            self._pick_single_name(frequency_table, sample)
+            self._pick_single_names(frequency_table, sample)
             for sample in samples]
     
     def random_first_names(self, gender, yob, count, rng):
         base_names = pd.read_csv(
             os.path.join(
+                '.',
                 'first_names',
                 'yob{0:04d}.txt'.format(yob)),
-            head=False)
+            header=None)
         
         base_names.columns = [
-            'name', 'type', 'name_count']
+            'names', 'type', 'name_count']
         
         name_type = (
             'M' if gender == 'pctmale' else 'F')
         
         return self._pick_names(
-            name_type, base_names, count, rng)
+            base_names[base_names['type'] == name_type],
+            count, 
+            rng)
     
-    def crandom_last_names(self, race, count, rng):
-        base_names = pd.read_csv(
+    def random_last_names(self, race, count, rng):
+        chosen_columns = pd.DataFrame({
+            'names' : self.last_names['name'],
+            'name_count' : (
+                self.last_names['count'] * 
+                (self.last_names[race]
+                 .replace('(S)', 0)
+                 .astype(float)))})
+        
+        return self._pick_names(chosen_columns, count, rng)
