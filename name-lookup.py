@@ -26,7 +26,7 @@ class GetDemoPercentagesFromNames():
     def __init__(self):
         self.last_name_freqs = pd.read_csv(
             os.path.join(
-                '.',
+                os.getcwd(),
                 'surnames',
                 'Names_2010Census.csv'),
             usecols=(
@@ -81,7 +81,7 @@ class GetDemoPercentagesFromNames():
     def build_gender_table(self):
         """Collect and join the fist name tables across all years"""
         first_name_directory = (
-            pathlib.Path('./first_names'))
+            pathlib.Path(os.path.join(os.getcwd(), 'first_names')))
         first_name_paths = (
             first_name_directory.glob('*.txt'))
         
