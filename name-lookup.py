@@ -174,7 +174,7 @@ class GetDemoPercentagesFromNames():
                                of imputation method.  case-insensitive.
         """
 
-        dob_datetimes = pd.to_datetime(dobs)
+        dob_datetimes = pd.to_datetime(dobs, errors='coerce')
         dob_datetimes[dob_datetimes.isnull()] = (
             datetime.datetime.fromisoformat('1990-01-01'))
         yobs = [
@@ -227,6 +227,12 @@ def main():
         default='applicant_dob',
         help='Name of column containing applicant dates of birth')
     command_line_parser.add_argument(
+        '-b', '--bad-input-filename',
+        dest='bad_input_filename',
+        type=str,
+        default=None,
+        help='Output filename for bad input samples')
+    command_line_parser.add_argument(
         'input_file_name',
         type=str,
         help='Input file name (\'-\' for standard input)')
@@ -239,9 +245,10 @@ def main():
     
     ##
     probability_converter = GetDemoPercentagesFromNames()
-    
-    first_name_columns = [args.first_name, args.date_of_birth]
-    last_name_columns =  [args.last_name]
+    first_name_column =  args.first_name
+    last_name_column =  args.last_name
+    first_name_columns = [first_name_column, args.date_of_birth]
+    last_name_columns =  [last_name_column]
     
     if args.input_file_name == '-':
         input_fd = sys.stdin
@@ -258,10 +265,27 @@ def main():
         output_fd = sys.stdout
     else:
         output_fd = open(args.output_file_name, 'w', newline='')
-        
+
+    if args.bad_input_filename is not None:
+         bad_input_fd = open(args.bad_input_filename, 'w')
+    else:
+         bad_input_fd = None
+
     header_block = True
     
     for input_block in input_data_iterator:
+        # collect bad inputs with missing first or last name
+        bad_input_block = input_block[
+             input_block[first_name_column].isna()
+           | input_block[last_name_column].isna()
+        ]
+
+        # trim inputs missing first or last name from input block
+        input_block = input_block[
+             input_block[first_name_column].notna()
+           & input_block[last_name_column].notna()
+        ]
+
         first_name_chunk = input_block[first_name_columns]
         first_name_probs = (
             probability_converter.build_first_name_freqs(
@@ -290,7 +314,14 @@ def main():
             header=header_block,
             mode='w',
             index=False)
-        
+
+        # if bad output file is enabled, write bad inputs to bad output file
+        if args.bad_input_filename:
+            bad_input_block.to_csv(
+                bad_input_fd,
+                header=header_block,
+                mode='w',
+                index=False)
         header_block = False
 
 if __name__ == '__main__':
